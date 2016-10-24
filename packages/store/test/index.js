@@ -1,8 +1,9 @@
 import R from "ramda"
 import {__, O, curry, always, isObj, keys} from "@culli/base"
-import Model from "../src/index"
+import Store from "../src/index"
 
-describe("Model Driver", () => {
+
+describe("Store", () => {
   it("emits its initial value", done => {
     __(M("tsers"), subscribeAndExpect(["tsers"], done))
   })
@@ -35,27 +36,21 @@ describe("Model Driver", () => {
     __(model, subscribeAndExpect(expected, done))
   })
 
-  it("gives a warning if modifications are not functions", done => {
-    const warnings = []
-    const model = M(1, O.from([2, 3]), {warn: (...args) => warnings.push(args)})
+  it("throws an error if modifications are not functions", done => {
+    const model = M(1, O.from([2, 3]), {logErrors: false})
     __(model, O.subscribe({
-      complete: () => {
-        warnings.should.deepEqual([2, 3].map(x => ["The given modification", x, "is not a function. Ignoring it..."]))
+      error: () => {
         done()
-      },
-      error: done
+      }
     }))
   })
 
-  it("gives a warning if modifications are not created by using model.mod or model.set", done => {
-    const warnings = []
-    const model = run(1, m => [m, O.from([2, 3].map(always))], {warn: (...args) => warnings.push(args)})
+  it("throws an error if modifications are not created by using model.mod or model.set", done => {
+    const model = run(1, m => [m, O.from([2, 3].map(always))], {logErrors: false})
     __(model, O.subscribe({
-      complete: () => {
-        warnings.should.deepEqual([2, 3].map(() => ["Received modification that was not created by using model's 'mod' method. Ignoring it..."]))
+      error: () => {
         done()
-      },
-      error: done
+      }
     }))
   })
 
@@ -93,7 +88,7 @@ describe("Model Driver", () => {
     })
 
     it("creates sinks for each key", () => {
-      const model = Model([{id: "1"}, {id: "2"}])(O.never(), O.Adapter)
+      const model = Store([{id: "1"}, {id: "2"}])(O.never(), O.Adapter)
       const children = model.mapChildren(Child, ["Foo", "Bar"], ["Lol"])
       isObj(children).should.be.true()
       keys(children).length.should.eql(3)
@@ -142,7 +137,7 @@ describe("Model Driver", () => {
 
 
 const run = (initial, fn, opts) => {
-  const m = Model(initial, opts)
+  const m = Store(initial, opts)
   const {observer, stream} = O.Adapter.makeSubject()
   const [model, mods] = fn(m(stream, O.Adapter))
   O.subscribe(observer, mods)
@@ -154,7 +149,7 @@ const M = (initial, mods = O.empty(), opts = {}, sets = O.empty()) =>
 
 const subscribeAndExpect = curry((expected, done, stream) => {
   expected = [...expected]
-  return __(stream, O.subscribe({
+  return __(stream.take(expected.length), O.subscribe({
     next: x => x.should.deepEqual(expected.shift()),
     complete: () => {
       expected.length.should.equal(0)

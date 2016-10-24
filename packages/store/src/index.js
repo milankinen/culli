@@ -1,49 +1,55 @@
-import {__, O} from "@culli/base"
-import {identity} from "./lenses"
-import makeMod from "./mod"
-import makeModel from "./model"
+import {__, O, isFun, throws} from "@culli/base"
+import {update, identity} from "./lenses"
+import makeStore from "./store"
+
+
+const DEV = process.env.NODE_ENV !== "production"
 
 
 export default function (initial, opts = {}) {
-  const {
-    eq = defaultEquality,
-    warn = defaultWarn,
-    error = defaultError,
-    } = opts
+  const {eq = strictEquals, logErrors = true} = opts
 
-
-  function ModelDriver(mods, SA) {
-    const Mod = makeMod(warn)
-    const Model = makeModel(SA, Mod, eq)
+  function StoreDriver(mods, SA) {
+    const Store = makeStore(SA, Mod, eq)
 
     const value =
-      __(mods,
-        O.filter(mod => (mod instanceof Mod) || (warn(
-          "Received modification that was not created by using model's 'mod' method. Ignoring it..."
-        ) && false)),
-        O.scan((s, mod) => mod.exec(s), initial),
+      __(O.merge([mods, O.never()]),
+        O.scan((s, mod) => {
+          DEV && !(mod instanceof Mod) && throws("Received modification is not valid: " + mod)
+          return mod.update(s)
+        }, initial),
         O.skipRepeats(eq),
         O.hold)
 
-    __(value, O.subscribe({error}))
+    __(value, O.subscribe({
+      error: err => {
+        if (logErrors) {
+          console.error(err.stack || err)   // eslint-disable-line no-console
+        }
+      }
+    }))
 
-    return Model(value, identity)
+    return Store(value, identity)
   }
 
-  ModelDriver.streamAdapter = O.Adapter
-  return ModelDriver
+  StoreDriver.streamAdapter = O.Adapter
+  return StoreDriver
 }
 
-function defaultEquality(a, b) {
+
+function strictEquals(a, b) {
   return a === b
 }
 
-function defaultWarn() {
-  const args = Array.prototype.slice.call(arguments)
-  console.warn.apply(null, args)      // eslint-disable-line
-}
+class Mod {
+  constructor(fn, lens) {
+    DEV && !isFun(fn) && throws("The given modification is not a function: " + fn)
+    this.f = fn
+    this.l = lens
+  }
 
-function defaultError() {
-  const args = Array.prototype.slice.call(arguments)
-  console.error.apply(null, args)     // eslint-disable-line
+  update(s) {
+    const {f, l} = this
+    return update(l, f, s)
+  }
 }

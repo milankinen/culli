@@ -5,8 +5,8 @@ import {MapChildrenSource, CycleSinkExtractSource} from "./children"
 
 export default (SA, Mod, equality) => {
   const convertIn = O.adaptIn(SA.streamSubscribe)
-  const convertOut = O.adaptOut(SA)
-  const outValue = pipe(convertOut, SA.remember)
+  const outStream = O.adaptOut(SA)
+  const outValue = pipe(outStream, SA.remember)
 
   const toMod = lens => fn =>
     new Mod(fn, lens)
@@ -14,21 +14,21 @@ export default (SA, Mod, equality) => {
   const skipDups = O.skipRepeats(equality)
   const toValue = pipe(skipDups, O.hold)
 
-  function Model(value, rootLens) {
+  function Store(value, rootLens) {
     function select(selector) {
       const lens = lift(selector)
-      return Model(toValue(O.map(v => get(lens, v), value)), comp(rootLens, lens))
+      return Store(toValue(O.map(v => get(lens, v), value)), comp(rootLens, lens))
     }
 
     function set(values) {
-      return __(convertIn(values), O.map(always), O.map(toMod(rootLens)), convertOut)
+      return __(convertIn(values), O.map(always), O.map(toMod(rootLens)), outStream)
     }
 
     function update(reducers) {
-      return __(convertIn(reducers), O.map(toMod(rootLens)), convertOut)
+      return __(convertIn(reducers), O.map(toMod(rootLens)), outStream)
     }
 
-    function mapChildrenBy(identityFn, fn, eventSinks = ["Model"], valueSinks = ["DOM"]) {
+    function mapChildrenBy(identityFn, fn, eventSinks = ["Store"], valueSinks = ["DOM"]) {
       // make sure identity is string type
       const ident = pipe(identityFn, str)
 
@@ -37,7 +37,7 @@ export default (SA, Mod, equality) => {
       const childFn = (item, key) => {
         const itemValue = outValue(item)
         const itemLens = find(it => ident(it) === key)
-        const itemModel = Model(itemValue, comp(rootLens, itemLens))
+        const itemModel = Store(itemValue, comp(rootLens, itemLens))
         return cycleSinksToInternal(fn(itemModel, key))
       }
 
@@ -46,7 +46,7 @@ export default (SA, Mod, equality) => {
       // list and is compatible with child value extraction
       const mcSource = new MapChildrenSource(value.source, ident, childFn, valueSinks, eventSinks)
       // create output sinks by extracting them by their key from the map children source
-      const events = extract(mcSource, eventSinks, pipe(O.multicast, convertOut), false)
+      const events = extract(mcSource, eventSinks, pipe(O.multicast, outStream), false)
       const values = extract(mcSource, valueSinks, pipe(O.hold, outValue), true)
       return extend({}, events, values)
     }
@@ -83,7 +83,7 @@ export default (SA, Mod, equality) => {
   }
 
 
-  return Model
+  return Store
 }
 
 function str(x) {
