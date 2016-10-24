@@ -5,18 +5,10 @@
   "description": "Cycle Utility Libraries for clean, well-structured and concise code",
   "author": "Matti Lankinen <m.lankinen@iki.fi> (https://github.com/milankinen)",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/milankinen/culli.git"
-  },
-  "keywords": [
-    "rxjs",
-    "reactive programming",
-    "cyclejs",
-    "most"
-  ],
+  "repository": { "type": "git", "url": "git+https://github.com/milankinen/culli.git" },
+  "keywords": [ "rxjs", "reactive programming", "cyclejs", "most" ],
   "scripts": {
-    "postinstall": "npm run setup",
+    "postinstall": "npm run setup && npm run build",
     "test:ci": "nb exec -- npm run test:ci",
     "report:ci": "nb exec -- npm run report:ci",
     "postreport:ci": "rimraf coverage && mkdir -p coverage && lcov-result-merger 'packages/*/coverage/lcov.info' coverage/lcov.info",
@@ -27,9 +19,9 @@
     "postclean": "rm -rf node_modules",
     "upd": "ncu -u -a && nb exec -- npm run update:deps",
     "newpkg": "lehm create package",
-    "commit": "nb commit",
+    "commit": "northbrook commit",
     "ci": "nb commit",
-    "release": "nb release --skip-login"
+    "release": "northbrook release"
   },
   "devDependencies": {
     "babel-cli": "^6.16.0",
@@ -58,11 +50,7 @@
     "validate-commit-msg": "^2.8.2"
   },
   "config": {
-    "ghooks": {
-      "commit-msg": "node ./node_modules/.bin/validate-commit-msg"
-    },
-    "validate-commit-msg": {
-      "types": "@northbrook/commit-types"
-    }
+    "ghooks": { "commit-msg": "node ./node_modules/.bin/validate-commit-msg" },
+    "validate-commit-msg": { "types": "@northbrook/commit-types" }
   }
 }
