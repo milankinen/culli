@@ -1,0 +1,45 @@
+{
+  "name": "@culli/{{name}}",
+  "version": "0.0.1",
+  "description": "{{description}}",
+  "author": "Matti Lankinen <m.lankinen@iki.fi> (https://github.com/milankinen)",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "esnext:main": "src/index.js",
+  "homepage": "https://github.com/milankinen/culli/tree/master/packages/{{name}}",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/milankinen/culli.git"
+  },
+  "keywords": [
+    "rxjs",
+    "reactive programming",
+    "cyclejs",
+    "most"
+  ],
+  "scripts": {
+    "update": "npm run update:binaries && npm run update:modules",
+    "update:modules": "../../node_modules/.bin/ncu -e 2 -u -a --packageFile ./package.json",
+    "update:binaries": "rm -f .bin && ln -s ../../node_modules/.bin .bin",
+    "test": "npm run lint && npm run mocha:all",
+    "lint": ".bin/eslint -c ../../.eslintrc src/** test/**",
+    "mocha:all": "npm run mocha -- --recursive test",
+    "mocha": ".bin/mocha --opts ../../mocha.opts",
+    "build:commonjs": ".bin/buble --no modules -i src -o lib",
+    "postbuild:commonjs": "NODE_PATH=../../node_modules .bin/babel --plugins transform-es2015-modules-commonjs lib -d lib",
+    "build:umd": "NODE_PATH=../../node_modules .bin/rollup -c",
+    "build:minify": ".bin/uglifyjs dist/culli.{{name}}.js -o dist/culli.{{name}}.min.js",
+    "build": "npm run build:commonjs && npm run build:umd && npm run build:minify",
+    "prebuild": ".bin/rimraf dist && mkdir -p dist",
+    "test:ci": ".bin/nyc npm t",
+    "report:ci": ".bin/nyc report --reporter=lcov",
+    "clean": "rm -rf dist lib node_modules .bin"
+  },
+  "devDependencies": {
+    "should": "^11.1.0"
+  },
+  "nyc": {
+    "extension": [ ".js" ],
+    "include": [ "src/*.js" ]
+  }
+}
