@@ -10,10 +10,10 @@
 
 The following utilities are available as npm packages:
 
-| **Package**                            | **Version**                                                                                                              | **Description** |
-|----------------------------------------|--------------------------------------------------------------------------------------------------------------------------|-----------------|
-| [`dom`](tree/master/packages/dom)      | [![npm](https://img.shields.io/npm/v/@culli/dom.svg?style=flat-square)](https://www.npmjs.com/package/@culli/dom)        | Utilities for DOM manipulation |
-| [`store`](tree/master/packages/store)  | [![npm](https://img.shields.io/npm/v/@culli/store.svg?style=flat-square)](https://www.npmjs.com/package/@culli/store)    | Utilities for state management and storage |
+| **Package**                               | **Version**                                                                                                              | **Description** |
+|-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|-----------------|
+| [`dom`](../tree/master/packages/dom)      | [![npm](https://img.shields.io/npm/v/@culli/dom.svg?style=flat-square)](https://www.npmjs.com/package/@culli/dom)        | Utilities for DOM manipulation |
+| [`store`](../tree/master/packages/store)  | [![npm](https://img.shields.io/npm/v/@culli/store.svg?style=flat-square)](https://www.npmjs.com/package/@culli/store)    | Utilities for state management and storage |
 
 
 ## Dev quickstart
