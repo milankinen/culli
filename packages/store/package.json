@@ -1,0 +1,54 @@
+{
+  "name": "@culli/store",
+  "version": "0.0.1",
+  "description": "Cycle Utilities for state management and storage",
+  "author": "Matti Lankinen <m.lankinen@iki.fi> (https://github.com/milankinen)",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "esnext:main": "src/index.js",
+  "homepage": "https://github.com/milankinen/culli/tree/master/packages/store",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/milankinen/culli.git"
+  },
+  "keywords": [
+    "rxjs",
+    "reactive programming",
+    "cyclejs",
+    "most"
+  ],
+  "scripts": {
+    "test": "npm run lint && npm run mocha:all",
+    "lint": ".bin/eslint -c ../../.eslintrc src/** test/**",
+    "mocha": ".bin/mocha --opts ../../mocha.opts",
+    "mocha:all": "npm run mocha -- --recursive test",
+    "update": "npm run update:bins && npm run update:deps",
+    "update:deps": "../../node_modules/.bin/ncu -u -a --packageFile ./package.json",
+    "update:bins": "rm -f .bin && ln -s ../../node_modules/.bin .bin",
+    "prebuild": ".bin/rimraf dist && mkdir -p dist",
+    "build": "npm run build:commonjs && npm run build:umd && npm run build:minify",
+    "build:commonjs": ".bin/buble --no modules -i src -o lib",
+    "postbuild:commonjs": "NODE_PATH=../../node_modules .bin/babel --plugins transform-es2015-modules-commonjs lib -d lib",
+    "build:umd": "NODE_PATH=../../node_modules .bin/rollup -c",
+    "build:minify": ".bin/uglifyjs dist/culli.store.js -o dist/culli.store.min.js",
+    "test:ci": ".bin/nyc npm t",
+    "report:ci": ".bin/nyc report --reporter=lcov",
+    "clean": "rm -rf dist lib node_modules .bin",
+    "preversion": "npm run build"
+  },
+  "dependencies": {
+    "@culli/base": "0.x"
+  },
+  "devDependencies": {
+    "ramda": "^0.22.1",
+    "should": "^11.1.1"
+  },
+  "nyc": {
+    "extension": [
+      ".js"
+    ],
+    "include": [
+      "src/*.js"
+    ]
+  }
+}

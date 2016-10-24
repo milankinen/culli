@@ -1,7 +1,8 @@
 {
   "packages": [
     "packages/base",
-    "packages/dom"
+    "packages/dom",
+    "packages/store"
   ],
   "plugins": [],
   "scripts": {}
