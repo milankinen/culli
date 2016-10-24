@@ -1,33 +1,91 @@
-import {__, O, pipe, keys, always, extend} from "@culli/base"
-import lift, {get, comp, find} from "./lenses"
+import {O, pipe, keys, extend, identity} from "@culli/base"
 import {MapChildrenSource, CycleSinkExtractSource} from "./children"
+import lift, * as L from "./lenses"
 
 
-export default (SA, Mod, equality) => {
+
+export default (SA, equality) => {
   const convertIn = O.adaptIn(SA.streamSubscribe)
   const outStream = O.adaptOut(SA)
   const outValue = pipe(outStream, SA.remember)
 
-  const toMod = lens => fn =>
-    new Mod(fn, lens)
-
   const skipDups = O.skipRepeats(equality)
   const toValue = pipe(skipDups, O.hold)
 
-  function Store(value, rootLens) {
+  const toAction = l => a =>
+    a instanceof Action ? a : new Action(a, l)
+
+  return function Store(value, rootLens) {
+    /**
+     * Creates a sub-store based on given selector. The created sub-store has exactly
+     * same features as this store but the it's state is focused on the given
+     * selector, hence updating the sub-model updates only the focused part of the
+     * parent model.
+     *
+     * Updates are bi-directional so updates to the sub-store are reflected to the
+     * parent model and vice versa.
+     *
+     * @param selector
+     *    String representing the object property name where to focus on OR integer
+     *    representing the array index.
+     *
+     * @returns
+     *    Sub-model with identical features as the parent model but its state
+     *    focused on the given selector
+     */
     function select(selector) {
       const lens = lift(selector)
-      return Store(toValue(O.map(v => get(lens, v), value)), comp(rootLens, lens))
+      return Store(toValue(O.map(s => L.get(lens, s), value)), L.comp(rootLens, lens))
     }
 
-    function set(values) {
-      return __(convertIn(values), O.map(always), O.map(toMod(rootLens)), outStream)
+    /**
+     * Creates a dispatch function that accepts streams of action objects. Those
+     * action objects are given to the reducer function which can calculate new
+     * state to the store.
+     *
+     * @param reducer
+     *    Reducer function `(state, action) => state` that updates store's state
+     *    based on the received actions.
+     *
+     * @returns {{dispatch: dispatch, value: *}}
+     *    Function taking a stream (or multiple streams) of actions and delivering
+     *    them to the given reducer function. The result value from this function
+     *    is a stream that should be returned to the store driver via sink.
+     */
+    function reduce(reducer) {
+      const dispatch = (...actions) => {
+        const storeLens =
+          L.comp(rootLens, L.lens(identity, (a, s) => reducer(s, a)))
+        const stream = !actions.length
+          ? O.empty()
+          : O.merge(actions.map(pipe(convertIn, O.map(toAction(storeLens)))))
+        return outStream(O.multicast(stream))
+      }
+      return dispatch
     }
 
-    function update(reducers) {
-      return __(convertIn(reducers), O.map(toMod(rootLens)), outStream)
+    /**
+     * TODO..
+     *
+     * @param fn
+     * @param eventSinks
+     * @param valueSinks
+     * @returns {*}
+     */
+    function mapChildren(fn, eventSinks, valueSinks) {
+      return mapChildrenBy(it => it.id, fn, eventSinks, valueSinks)
     }
 
+    /**
+     * Does exactly same as `mapChildren` but allows to define custom identity for the
+     * children instead of `id` property.
+     *
+     * @param identityFn
+     * @param fn
+     * @param eventSinks
+     * @param valueSinks
+     * @returns {*}
+     */
     function mapChildrenBy(identityFn, fn, eventSinks = ["Store"], valueSinks = ["DOM"]) {
       // make sure identity is string type
       const ident = pipe(identityFn, str)
@@ -36,8 +94,8 @@ export default (SA, Mod, equality) => {
       // model and converts returned cycle sinks (from app) back to internal streams
       const childFn = (item, key) => {
         const itemValue = outValue(item)
-        const itemLens = find(it => ident(it) === key)
-        const itemModel = Store(itemValue, comp(rootLens, itemLens))
+        const itemLens = L.find(it => ident(it) === key)
+        const itemModel = Store(itemValue, L.comp(rootLens, itemLens))
         return cycleSinksToInternal(fn(itemModel, key))
       }
 
@@ -51,16 +109,19 @@ export default (SA, Mod, equality) => {
       return extend({}, events, values)
     }
 
-    function mapChildren(fn, eventSinks, valueSinks) {
-      return mapChildrenBy(it => it.id, fn, eventSinks, valueSinks)
-    }
-
+    // Public API
     return {
-      value: outValue(value),
-      select, set, update,
-      mapChildrenBy, mapChildren
+      value: extend(outValue(value), {
+        select,
+        mapChildrenBy,
+        mapChildren
+      }),
+      actions: {
+        reduce
+      }
     }
   }
+
 
   function extract(mapChildrenSource, sinkNames, toOutput, isValue) {
     const extracted = {}
@@ -81,9 +142,18 @@ export default (SA, Mod, equality) => {
     }
     return internal
   }
+}
 
+export class Action {
+  constructor(val, lens) {
+    this.v = val
+    this.l = lens
+  }
 
-  return Store
+  apply(state) {
+    const {v, l} = this
+    return L.set(l, v, state)
+  }
 }
 
 function str(x) {

@@ -1,6 +1,6 @@
-import {__, O, isFun, throws} from "@culli/base"
-import {update, identity} from "./lenses"
-import makeStore from "./store"
+import {__, O, throws} from "@culli/base"
+import makeStore, {Action} from "./store"
+import * as L from "./lenses"
 
 
 const DEV = process.env.NODE_ENV !== "production"
@@ -9,14 +9,14 @@ const DEV = process.env.NODE_ENV !== "production"
 export default function (initial, opts = {}) {
   const {eq = strictEquals, logErrors = true} = opts
 
-  function StoreDriver(mods, SA) {
-    const Store = makeStore(SA, Mod, eq)
+  function StoreDriver(actions, SA) {
+    const Store = makeStore(SA, eq)
 
     const value =
-      __(O.merge([mods, O.never()]),
-        O.scan((s, mod) => {
-          DEV && !(mod instanceof Mod) && throws("Received modification is not valid: " + mod)
-          return mod.update(s)
+      __(O.merge([actions, O.never()]),
+        O.scan((s, action) => {
+          DEV && !(action instanceof Action) && throws("Received action is not valid: " + action)
+          return action.apply(s)
         }, initial),
         O.skipRepeats(eq),
         O.hold)
@@ -29,7 +29,7 @@ export default function (initial, opts = {}) {
       }
     }))
 
-    return Store(value, identity)
+    return Store(value, L.identity)
   }
 
   StoreDriver.streamAdapter = O.Adapter
@@ -39,17 +39,4 @@ export default function (initial, opts = {}) {
 
 function strictEquals(a, b) {
   return a === b
-}
-
-class Mod {
-  constructor(fn, lens) {
-    DEV && !isFun(fn) && throws("The given modification is not a function: " + fn)
-    this.f = fn
-    this.l = lens
-  }
-
-  update(s) {
-    const {f, l} = this
-    return update(l, f, s)
-  }
 }
