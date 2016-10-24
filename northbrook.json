@@ -1,4 +1,7 @@
 {
+  "packages": [
+    "packages/base"
+  ],
   "plugins": [],
   "scripts": {}
 }
