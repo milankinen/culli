@@ -1,6 +1,6 @@
 {
   "name": "@culli/dom",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Cycle Utilities for DOM manipulation",
   "author": "Matti Lankinen <m.lankinen@iki.fi> (https://github.com/milankinen)",
   "license": "MIT",
