@@ -28,8 +28,8 @@
     "upd": "ncu -u -a && nb exec -- npm run update:deps",
     "newpkg": "lehm create package",
     "commit": "nb commit",
-    "release": "nb release",
-    "ci": "nb commit"
+    "ci": "nb commit",
+    "release": "nb release --skip-login"
   },
   "devDependencies": {
     "babel-cli": "^6.16.0",
