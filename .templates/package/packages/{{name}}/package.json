@@ -33,7 +33,8 @@
     "build:minify": ".bin/uglifyjs dist/culli.{{name}}.js -o dist/culli.{{name}}.min.js",
     "test:ci": ".bin/nyc npm t",
     "report:ci": ".bin/nyc report --reporter=lcov",
-    "clean": "rm -rf dist lib node_modules .bin"
+    "clean": "rm -rf dist lib node_modules .bin",
+    "preversion": "npm run build"
   },
   "devDependencies": {
     "should": "^11.1.0"
