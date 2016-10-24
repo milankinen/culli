@@ -1,0 +1,16 @@
+*.iml
+.idea
+.DS_Store
+
+.npm
+node_modules
+
+*.log
+
+.bin
+lib
+dist
+typings
+
+coverage
+.nyc_output
