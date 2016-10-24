@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+  - "6"
+  - "5"
+  - "4"
+script:
+  - npm run build
+  - npm run test:ci
+after_success:
+  # make reports and combine them
+  - npm run report:ci
+  # send reports to codecov
+  #- ./node_modules/.bin/codecov
