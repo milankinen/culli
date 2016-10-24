@@ -2,7 +2,7 @@ import {O, keys, isArray, throws} from "@culli/base"
 
 const NONE = {}
 
-const DEV = process.env.NODE_ENV === "development"
+const DEV = process.env.NODE_ENV !== "production"
 
 /**
  * Source for combinator:
