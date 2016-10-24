@@ -10,7 +10,6 @@ node_modules
 .bin
 lib
 dist
-typings
 
 coverage
 .nyc_output

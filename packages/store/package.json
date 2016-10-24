@@ -6,6 +6,7 @@
   "license": "MIT",
   "main": "lib/index.js",
   "esnext:main": "src/index.js",
+  "typings": "typings/culli.store.d.ts",
   "homepage": "https://github.com/milankinen/culli/tree/master/packages/store",
   "repository": {
     "type": "git",

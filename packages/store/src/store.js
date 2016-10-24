@@ -146,13 +146,13 @@ export default (SA, equality) => {
 
 export class Action {
   constructor(val, lens) {
-    this.v = val
+    this.value = val
     this.l = lens
   }
 
   apply(state) {
-    const {v, l} = this
-    return L.set(l, v, state)
+    const {value, l} = this
+    return L.set(l, value, state)
   }
 }
 
