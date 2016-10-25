@@ -1,23 +1,25 @@
-import {__, O, throws} from "@culli/base"
+import {__, O, throws, pipe} from "@culli/base"
 import makeStore, {Action} from "./store"
 import * as L from "./lenses"
-
 
 const DEV = process.env.NODE_ENV !== "production"
 
 
-export default function (initial, opts = {}) {
+// Driver Factory
+
+export default function (storage, opts = {}) {
   const {eq = strictEquals, logErrors = true} = opts
 
   function StoreDriver(actions, SA) {
     const Store = makeStore(SA, eq)
 
+    const adaptedStorage =
+      storage.__culli ? storage : pipe(O.adaptOut(SA), storage, O.adaptIn(SA.streamSubscribe))
+
     const value =
-      __(O.merge([actions, O.never()]),
-        O.scan((s, action) => {
-          DEV && !(action instanceof Action) && throws("Received action is not valid: " + action)
-          return action.apply(s)
-        }, initial),
+      __(actions,
+        O.tap(action => DEV && !(action instanceof Action) && throws("Received action is not valid: " + action)),
+        adaptedStorage,
         O.skipRepeats(eq),
         O.hold)
 
@@ -32,11 +34,14 @@ export default function (initial, opts = {}) {
     return Store(value, L.identity)
   }
 
+  function strictEquals(a, b) {
+    return a === b
+  }
+
   StoreDriver.streamAdapter = O.Adapter
   return StoreDriver
 }
 
+// Storages
 
-function strictEquals(a, b) {
-  return a === b
-}
+export {default as Memory} from "./storage/memory"

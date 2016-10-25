@@ -164,7 +164,7 @@ class MapChildrenSink {
   }
 
   end() {
-    DEV && throws("Model should not end")
+    //DEV && throws("Model should not end")
   }
 
   itemEvent(t, val, name, idx) {

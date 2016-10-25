@@ -1,6 +1,6 @@
 import R from "ramda"
 import {__, O, curry} from "@culli/base"
-import Store from "../src/index"
+import Store, {Memory} from "../src/index"
 
 
 describe("Store", () => {
@@ -71,7 +71,7 @@ describe("Store", () => {
 
 
 const run = (initial, fn, opts) => {
-  const st = Store(initial, opts)
+  const st = Store(Memory(initial), opts)
   const {observer, stream} = O.Adapter.makeSubject()
   const [value, actions] = fn(st(stream, O.Adapter))
   O.subscribe(observer, actions)

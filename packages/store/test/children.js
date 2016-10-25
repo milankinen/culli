@@ -1,6 +1,6 @@
 import {__, O, curry, isObj, keys} from "@culli/base"
 import R from "ramda"
-import Store from "../src/index"
+import Store, {Memory} from "../src/index"
 
 
 describe("mapChildren", () => {
@@ -10,7 +10,7 @@ describe("mapChildren", () => {
   })
 
   it("creates sinks for each key", () => {
-    const store = Store([{id: "1"}, {id: "2"}])(O.never(), O.Adapter)
+    const store = Store(Memory([{id: "1"}, {id: "2"}]))(O.never(), O.Adapter)
     const children = store.value.mapChildren(Child, ["Foo", "Bar"], ["Lol"])
     isObj(children).should.be.true()
     keys(children).length.should.eql(3)
@@ -59,7 +59,7 @@ describe("mapChildren", () => {
 
 
 const run = (initial, fn, opts) => {
-  const st = Store(initial, opts)
+  const st = Store(Memory(initial), opts)
   const {observer, stream} = O.Adapter.makeSubject()
   const [value, actions] = fn(st(stream, O.Adapter))
   O.subscribe(observer, actions)
