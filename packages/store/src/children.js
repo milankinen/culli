@@ -179,7 +179,8 @@ class MapChildrenSink {
   }
 
   itemError(t, err, name) {
-    const {cache, sinks: {[name]: sink}} = this
+    const {cache, sinks} = this
+    const sink = sinks[name]
     if (cache === null) {
       this.q.push({type: "error", t, err, name})
     } else {
@@ -201,7 +202,8 @@ class MapChildrenSink {
   }
 
   _emitValue(t, name) {
-    const {cache, sinks: {[name]: sink}} = this
+    const {cache, sinks} = this
+    const sink = sinks[name]
     if (sink) {
       let i = cache.length, val = Array(i)
       while (i--) {
