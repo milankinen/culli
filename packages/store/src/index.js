@@ -45,3 +45,4 @@ export default function (storage, opts = {}) {
 // Storages
 
 export {default as Memory} from "./storage/memory"
+export {default as HotReloadable} from "./storage/hotReloadable"
