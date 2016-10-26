@@ -1,0 +1,26 @@
+{
+  "name": "culli-store-tutorials",
+  "version": "0.1.0",
+  "description": "",
+  "author": "Matti Lankinen <m.lankinen@iki.fi> (https://github.com/milankinen)",
+  "license": "MIT",
+  "scripts": {
+    "build-1": "browserify -t babelify 01-basic-usage/index.js > 01-basic-usage/bundle.js",
+    "build-2": "browserify -t babelify 02-child-components/index.js > 02-child-components/bundle.js",
+    "build-3": "browserify -t babelify 03-dynamic-list/index.js > 03-dynamic-list/bundle.js",
+    "start": "npm run build-1 && npm run build-2 && npm run build-3 && open index.html"
+  },
+  "dependencies": {
+    "@culli/store": "latest",
+    "@cycle/dom": "^13.0.0",
+    "@cycle/isolate": "^1.4.0",
+    "@cycle/most-run": "^4.1.3",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-stage-2": "^6.18.0",
+    "babelify": "^7.3.0",
+    "browserify": "^13.1.1",
+    "most": "^1.0.4",
+    "watchify": "^3.7.0",
+    "xstream": "^7.0.0"
+  }
+}
