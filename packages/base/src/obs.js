@@ -1,5 +1,4 @@
 import * as most from "most"
-import {create as mcreate} from "@most/create"
 import mhold from "@most/hold"
 import {subject} from "most-subject"
 import curry from "./curry"
@@ -52,9 +51,9 @@ export const tapOnDispose = curry(function tapOnDispose(fn, stream) {
   return new Stream(new TapOnDispose(fn, stream.source))
 })
 
-export const create = curry(f => mcreate((next, complete, error) => {
-  return f({next, complete, error})
-}))
+export const create = f =>
+  fromSource(new Create(f))
+
 
 export const fromSource = source => {
   return new Stream(source)
@@ -118,5 +117,75 @@ CallbackDisposable.prototype.dispose = function () {
   if (cb) {
     this.cb = void 0
     cb()
+  }
+}
+
+
+class Create {
+  constructor(fn) {
+    this.f = fn
+  }
+
+  run(sink, scheduler) {
+    return scheduler.asap(new CreateTask(this.f, scheduler, sink))
+  }
+}
+
+class CreateTask {
+  constructor(fn, scheduler, sink) {
+    this.s = scheduler
+    this.f = fn
+    this.d = void 0
+    this.active = true
+    this.sink = sink
+  }
+
+  run() {
+    if (this.active) {
+      const observer = {
+        next: x => this.next(x),
+        error: e => this.error(e),
+        complete: () => this.complete()
+      }
+      const {f} = this
+      this.d = f(observer)
+    }
+  }
+
+  dispose() {
+    const {d, active} = this
+    this.active = false
+    this.d = void 0
+    active && d && d()
+  }
+
+  next(x) {
+    try {
+      this.active && this.sink.event(this.s.now(), x)
+    } catch (err) {
+      this.error(err)
+    }
+  }
+
+  error(err) {
+    const {active} = this
+    this.active = false
+    try {
+      active && this.sink.error(this.s.now(), err)
+    } catch (err) {
+      // TODO: fatal error?
+      console.log(err)    // eslint-disable-line no-console
+    }
+  }
+
+  complete() {
+    const {active} = this
+    this.active = false
+    try {
+      active && this.sink.end(this.s.now())
+    } catch (err) {
+      // TODO: fatal error?
+      console.log(err)    // eslint-disable-line no-console
+    }
   }
 }
