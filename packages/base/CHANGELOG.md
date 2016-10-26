@@ -1,3 +1,12 @@
+# v0.1.2 (2016-10-27)
+---
+
+
+## Bug Fixes
+
+- fix(base): Fix invalid stream subscribe from O.Adapter [b441ec87](https://github.com/milankinen/culli/commits/b441ec874131326fb0d29cf9e27ac7a895b302a8)
+
+
 # v0.1.1 (2016-10-24)
 ---
 
