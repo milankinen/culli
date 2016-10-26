@@ -87,7 +87,7 @@ export const Adapter = {
     return {observer: o, stream: s}
   },
   streamSubscribe(s, o) {
-    return subscribe(s, o)
+    return subscribe(o, s)
   }
 }
 
