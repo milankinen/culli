@@ -170,7 +170,7 @@ class MapChildrenSink {
   itemEvent(t, val, name, idx) {
     const {cache} = this
     if (cache === null) {
-      this.q.push({type: "event", t, val, name, idx})
+      this.queue.push({type: "event", t, val, name, idx})
     } else if (idx !== -1) {
       this._handleValue(t, val, name, cache[idx])
     } else {
