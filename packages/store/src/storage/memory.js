@@ -1,11 +1,12 @@
 import {O} from "@culli/base"
 
 function Memory (initialState) {
-  return function MemoryStorage(actions) {
+  function MemoryStorage(actions) {
     return O.scan((s, a) => a.apply(s), initialState, actions)
   }
+  MemoryStorage.__culli = true
+  return MemoryStorage
 }
 
-Memory.__culli = true
 
 export default Memory

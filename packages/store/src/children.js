@@ -396,7 +396,12 @@ class ItemTask {
   }
 
   run() {
-    this.it._started()
+    this.it && this.it._started()
+  }
+
+  dispose() {
+    // TODO: should we do something else??
+    this.it = null
   }
 }
 

@@ -5,11 +5,13 @@ function HotReloadable (initialState, reloadKey = "__culli_HMR_State") {
     initialState = window[reloadKey]
   }
 
-  return function HotReloadableMemoryStorage(actions) {
+  function HotReloadableMemoryStorage(actions) {
     return Memory(initialState)(actions)
   }
+
+  HotReloadableMemoryStorage.__culli = true
+  return HotReloadableMemoryStorage
 }
 
-HotReloadable.__culli = true
 
 export default HotReloadable
