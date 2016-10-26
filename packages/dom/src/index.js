@@ -1,4 +1,4 @@
-import {__, O, extend} from "@culli/base"
+import {O, extend} from "@culli/base"
 import {isStr, newId} from "./util"
 import H from "./h"
 import Combine from "./combine"
@@ -15,7 +15,6 @@ import StaticElement from "./vdom/StaticElem"
 
 export default function (domRoot) {
   function DOMDriver(vdom, SA) {
-    const convertIn = O.adaptIn(SA.streamSubscribe)
     const events = new Events()
     const context = {}
 
@@ -43,13 +42,13 @@ export default function (domRoot) {
         domRoot.appendChild(app.create())
       }
     }
-    __(convertIn(vdom), O.subscribe({
+    O.subscribe({
       next: vnode => {
         const app = context.link(vnode, rootNode)
         events.mount(domRoot)
         app.start()
       }
-    }))
+    }, vdom)
 
     return {
       h: context.h,

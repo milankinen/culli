@@ -30,7 +30,11 @@ export const startMods = (mods, observer) => {
   const next = mod => {
     observer.onMod(mod)
   }
-  return mods && mods.length ? O.subscribe({next}, mods.length > 1 ? O.merge(mods) : mods[0]) : void 0
+  const error = err => {
+    // TODO: better error handling
+    console.error(err.stack || err)   // eslint-disable-line
+  }
+  return mods && mods.length ? O.subscribe({next, error}, mods.length > 1 ? O.merge(mods) : mods[0]) : void 0
 }
 
 export const stopMods = dispose => {
