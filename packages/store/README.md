@@ -64,15 +64,13 @@ Here is the traditional counter app written with `@culli/store` (and with `most`
 ```js
 import * as O from "most"
 import {run} from "@cycle/most-run"
-import {makeDOMDriver as DOM} from "@cycle/dom"
+import {makeDOMDriver as DOM, h} from "@cycle/dom"
 import Store, {Memory} from "@culli/store"
 
 run(main, {
   DOM: DOM("#app"),
   Store: Store(Memory({num: 0}))
 })
-
-
 
 function main({DOM, Store}) {
   const {dispatch, props} = model(Store)
@@ -106,9 +104,9 @@ function main({DOM, Store}) {
   }
 
   function view({num}) {
-    return num.map(num => 
+    return num.map(num =>
       h("div", [
-        h("h1", ["Counter: ", num]),
+        h("h1", [`Counter: ${num}`]),
         h("div", [
           h("button.inc", "Increment"),
           h("button.dec", "Decrement")
@@ -119,10 +117,10 @@ function main({DOM, Store}) {
   function intent(DOM) {
     const incrementActions = DOM.select(".inc")
       .events("click")
-      .map(() => ({type: "INC"})
+      .map(() => ({type: "INC"}))
     const decrementActions = DOM.select(".dec")
       .events("click")
-      .mpa(() => ({type: "DEC"})
+      .map(() => ({type: "DEC"}))
 
     return O.merge(incrementActions, decrementActions)
   }
@@ -131,7 +129,7 @@ function main({DOM, Store}) {
 
 - - -
 
-Okay, let's look at the code line by line.
+Let's look at the code line by line.
 
 ```js
 import Store, {Memory} from "@culli/store"
@@ -222,7 +220,7 @@ function intent(DOM) {
     .map(() => ({type: "INC"})
   const decrementActions = DOM.select(".dec")
     .events("click")
-    .mpa(() => ({type: "DEC"})
+    .map(() => ({type: "DEC"})
 
   return O.merge(incrementActions, decrementActions)
 }
@@ -300,7 +298,7 @@ function main({DOM, Store}) {
       props: {
         a: value.select("a"),
         b: value.select("b"),
-        text: value.map(s => s.text)
+        text: value.select("text")
       }
     }
   }
@@ -318,7 +316,7 @@ function main({DOM, Store}) {
           bDOM,
           h("hr"),
           h("input.text", {props: {value: txt}})
-        ]), [counterA.DOM, counterB.DOM, text])
+        ]), [counterA.DOM, counterB.DOM, text.value])
     }
   }
 
@@ -336,6 +334,7 @@ function main({DOM, Store}) {
 Again, let's go through the code line by line.
 
 - - -
+
 ```js
 import {main as Counter} from "./previous-example"
 ```
@@ -367,17 +366,18 @@ function model({actions, value}) {
     props: {
       a: value.select("a"),
       b: value.select("b"),
-      text: value.map(s => s.text)
+      text: value.select("text")
     }
   }
 }
 ```
 Look pretty same as in the previous example, huh? Note that because the parent component
 wants to update only `text` property, we are reacting only to `SET_TEXT` actions in the reducer.
-There should be nothing new in the code, except these two lines:
+There should be nothing new in the code, except these three lines:
 ```js
 a: value.select("a"),
 b: value.select("b"),
+text: value.select("text")
 ```
 Although store's values are normal observables, `@culli/store` adds one extra method to 
 them, `select`. This method takes one argument which represents property name in the state.
@@ -398,14 +398,15 @@ function view({a, b, text}) {
   return {
     childActions: O.merge(counterA.Store, counterB.Store),
     vdom: O.combineArray((aDOM, bDOM, txt) =>
-      h("div", ...), [counterA.DOM, counterB.DOM, text])
+      h("div", ...), [counterA.DOM, counterB.DOM, text.value])
   }
 }
 ```
 Here comes the interesting part: now that our focused stores have identical features
 as the parent store, we can use them as `Store` source in our child components! Then
 we can use child components' return values (`DOM` and `Store` in this case) like we'd 
-use them in traditional Cycle apps.
+use them in traditional Cycle apps. Also note that because `text.value` is a normal
+observable, you can use it with any other combinators like `combineArray`.
 
 **NOTE:** In case you're wondering why we're using `isolate` here - we need to isolate
 `DOM` events (clicks) from sibling counters `a` and `b`. Isolation has no effect to
@@ -428,9 +429,156 @@ That's it!
 
 `TODO...`
 
+```js
+import * as O from "most"
+import isolate from "@cycle/isolate"
+import {run} from "@cycle/most-run"
+import {makeDOMDriver as DOM, h} from "@cycle/dom"
+import Store, {Memory} from "@culli/store"
+
+import Counter from "./Counter"
+
+let id = 0
+const newId = () => ++id
+
+run(main, {
+  DOM: DOM("#app"),
+  Store: Store(Memory({items: [{id: newId(), num: 0}, {id: newId(), num: 0}]}))
+})
+
+
+function main({DOM, Store}) {
+  const {dispatch, props} = model(Store)
+  const {vdom, childActions} = view(props)
+  const actions = intent(DOM)
+
+  return {
+    DOM: vdom,
+    Store: O.merge(dispatch(actions), childActions)
+  }
+
+
+  function model({actions, value}) {
+    const dispatch = actions.reduce((state, action) => {
+      switch (action.type) {
+        case "ADD":
+          return {...state, items: [...state.items, {id: newId(), num: 0}]}
+        default:
+          return state
+      }
+    })
+
+    return {
+      dispatch,
+      props: {
+        items: value.select("items")
+      }
+    }
+  }
+
+  function view({items}) {
+    const children = items.value.mapChildren((counter, id) => {
+      const Component = isolate(Counter, id)
+      return Component({DOM, Store: counter})
+    }, {values: ["DOM"], events: ["Store"]})
+
+    return {
+      childActions: children.Store,
+      vdom: children.DOM.map(childDOMs => h("div", [
+        h("h1", "Counter list"),
+        h("div", childDOMs),
+        h("hr"),
+        h("button.add", "Add new counter")
+      ]))
+    }
+  }
+
+  function intent(DOM) {
+    return DOM.select(".add")
+      .events("click")
+      .map(e => ({type: "ADD"}))
+  }
+}
+```
+
+And yet again, let's go through the code line by line...
+
+- - -
+
+```js
+run(main, {
+  DOM: DOM("#app"),
+  Store: Store(Memory({items: [{id: newId(), num: 0}, {id: newId(), num: 0}]}))
+})
+```
+Here we initialize the state with to preset counters. In order to work efficiently, 
+`@culli/store` needs some kind of way to identify individual items. By default, `id`
+property is used for the job, hence we need to also give unique ids to your list items.
+
+```js
+const children = items.value.mapChildren((counter, id) => {
+  const Component = isolate(Counter, id)
+  return Component({DOM, Store: counter})
+}, {values: ["DOM"], events: ["Store"]})
+```
+Here we go! This is basically all you need to do when processing dynamic lists with
+`@culli/store`. Store's value has `mapChildren` which iterates and calls the given
+transform function for each list item. Transform function receives two arguments:
+item which is `Store` instance focused on the specific item (same as we did with
+`select` previously) and identity of the item. By using these values, you can call
+the child component and return its sinks to `mapChildren`. Notice that again you
+can use the focused store as a store in the child component!
+
+The return value of `mapChildren` is a CycleJS sink object that emits values from
+the created child components. But unfortunately **there is a catch**: `mapChildren` 
+doesn't know the extracted sinks beforehand. That's why you must give a `{values, events}` 
+object/spec which defines the names of the extracted value and event sinks 
+(if you're not familiar with observable values and events, please see [this](TODO)).
+Value sinks are exracted by using `combine` combinator (resulting an observable
+with signature `Observable<Array<V>>`). Event sinks are extracted by using 
+`merge` combinator (resulting an observable with signature `Observable<E>`). 
+ 
+**NOTE:** if your items don't have `id` field, store has also `mapChildrenBy` which
+takes an additional key function, which can be used to define the identity for items
+by using other means than `id`:
+
+```js
+const customIdentity = item =>
+  item.otherKey
+  
+const children = items.value.mapChildrenBy(customIdentity, (item, key) => {
+  // now: key === otherKey
+  ...
+}, {values: ..., events: ...})
+```
+
+
+Now you can use e.g. the child vdom nodes to build your parent component's virtual dom:
+```js
+return {
+  childActions: children.Store,
+  vdom: children.DOM.map(childDOMs => h("div", [
+    ...
+  ]))
+}
+```
+
+### Some persistence thx!
+
+`TODO...`
+
+### What else?
+
+Congrats! There is nothing new to learn. You known how to read, write and splice the
+state: the basic ingredients that can be used to build any kind of app, let it be small 
+or big. Happy coding!
+
+All runnable tutorial codes are available [here](../../tutorials/store).
+
+
 ## API
 
-Please see [here](API.md)
+To see the API docs, please go [here](API.md)
 
 
 ## License
