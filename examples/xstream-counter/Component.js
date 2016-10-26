@@ -1,13 +1,13 @@
-import * as O from "most"
+import xs from "xstream"
 
 
-export default function main({DOM: {h, lift: dom}, Store}) {
+export default function main({DOM: {h, combine}, Store}) {
   const {dispatch, props} = model(Store)
   const vdom = view(props)
   const actions = intent(vdom)
 
   return {
-    DOM: dom(vdom),
+    DOM: combine(vdom),
     Store: dispatch(actions)
   }
 
@@ -16,9 +16,9 @@ export default function main({DOM: {h, lift: dom}, Store}) {
     const dispatch = actions.reduce((state, action) => {
       switch (action.type) {
         case "INC":
-          return state + 1
+          return {...state, num: state.num + 1}
         case "DEC":
-          return state - 1
+          return {...state, num: state.num - 1}
         default:
           return state
       }
@@ -27,14 +27,14 @@ export default function main({DOM: {h, lift: dom}, Store}) {
     return {
       dispatch,
       props: {
-        value
+        num: value.select("num")
       }
     }
   }
 
-  function view({value}) {
+  function view({num}) {
     return h("div", [
-      h("h1", ["Counter: ", value]),
+      h("h1", ["Counter: ", num.value]),
       h("div", [
         h("button.inc", "Increment"),
         h("button.dec", "Decrement")
@@ -43,13 +43,11 @@ export default function main({DOM: {h, lift: dom}, Store}) {
   }
 
   function intent(vdom) {
-    const incClicks = vdom.on(".inc", "click")
-    const decClicks = vdom.on(".dec", "click")
-
-    return O.mergeArray([
-      incClicks.map(() => ({type: "INC"})),
-      decClicks.map(() => ({type: "DEC"}))
-    ])
+    return xs.merge(
+      vdom.on(".inc", "click")
+        .map(() => ({type: "INC"})),
+      vdom.on(".dec", "click")
+        .map(() => ({type: "DEC"}))
+    )
   }
-
 }

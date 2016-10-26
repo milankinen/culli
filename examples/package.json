@@ -5,15 +5,17 @@
   "author": "Matti Lankinen <m.lankinen@iki.fi> (https://github.com/milankinen)",
   "license": "MIT",
   "scripts": {
-    "watch": "mkdir -p public && watchify index.js -v -t babelify -o public/bundle.js"
+    "watch": "watchify sum/index.js -v -t babelify -o bundle.js"
   },
   "dependencies": {
+    "@culli/dom": "latest",
+    "@culli/store": "latest",
     "@cycle/most-run": "^4.1.3",
+    "@cycle/xstream-run": "^3.1.0",
     "babel-preset-es2015": "^6.16.0",
     "babel-preset-stage-2": "^6.17.0",
     "babelify": "^7.3.0",
     "watchify": "^3.7.0",
-    "@culli/dom": "file:../packages/dom",
-    "@culli/store": "file:../packages/store"
+    "xstream": "^7.0.0"
   }
 }
