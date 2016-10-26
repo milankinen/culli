@@ -16,42 +16,11 @@ export default (SA, equality) => {
     a instanceof Action ? a : new Action(a, l)
 
   return function Store(value, rootLens) {
-    /**
-     * Creates a sub-store based on given selector. The created sub-store has exactly
-     * same features as this store but the it's state is focused on the given
-     * selector, hence updating the sub-model updates only the focused part of the
-     * parent model.
-     *
-     * Updates are bi-directional so updates to the sub-store are reflected to the
-     * parent model and vice versa.
-     *
-     * @param selector
-     *    String representing the object property name where to focus on OR integer
-     *    representing the array index.
-     *
-     * @returns
-     *    Sub-model with identical features as the parent model but its state
-     *    focused on the given selector
-     */
     function select(selector) {
       const lens = lift(selector)
       return Store(toValue(O.map(s => L.get(lens, s), value)), L.comp(rootLens, lens))
     }
 
-    /**
-     * Creates a dispatch function that accepts streams of action objects. Those
-     * action objects are given to the reducer function which can calculate new
-     * state to the store.
-     *
-     * @param reducer
-     *    Reducer function `(state, action) => state` that updates store's state
-     *    based on the received actions.
-     *
-     * @returns {{dispatch: dispatch, value: *}}
-     *    Function taking a stream (or multiple streams) of actions and delivering
-     *    them to the given reducer function. The result value from this function
-     *    is a stream that should be returned to the store driver via sink.
-     */
     function reduce(reducer) {
       const dispatch = (...actions) => {
         const storeLens =
@@ -64,28 +33,10 @@ export default (SA, equality) => {
       return dispatch
     }
 
-    /**
-     * TODO..
-     *
-     * @param fn
-     * @param eventSinks
-     * @param valueSinks
-     * @returns {*}
-     */
     function mapChildren(fn, eventSinks, valueSinks) {
       return mapChildrenBy(it => it.id, fn, eventSinks, valueSinks)
     }
 
-    /**
-     * Does exactly same as `mapChildren` but allows to define custom identity for the
-     * children instead of `id` property.
-     *
-     * @param identityFn
-     * @param fn
-     * @param eventSinks
-     * @param valueSinks
-     * @returns {*}
-     */
     function mapChildrenBy(identityFn, fn, eventSinks = ["Store"], valueSinks = ["DOM"]) {
       // make sure identity is string type
       const ident = pipe(identityFn, str)
@@ -122,6 +73,7 @@ export default (SA, equality) => {
     }
   }
 
+  // ... internal ...
 
   function extract(mapChildrenSource, sinkNames, toOutput, isValue) {
     const extracted = {}
