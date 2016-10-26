@@ -14,11 +14,8 @@ import * as O from "most"
 import {run} from "@cycle/most-run"
 import DOM from "@culli/dom"
 
-function main(x) {
-  console.log(x)
-  const {DOM: {h, combine}} = x
-  const date =
-    O.periodic(1000).map(() => new Date().toTimeString())
+function main({DOM: {h, combine}}) {
+  const date = O.periodic(1000).map(() => new Date().toTimeString())
 
   const vdom = h("div", [
     h("h2", ["Clock is: ", date])
