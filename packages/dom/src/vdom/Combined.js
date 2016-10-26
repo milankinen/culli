@@ -1,5 +1,5 @@
 export default ({link}) => {
-  class Lifted {
+  class Combined {
     constructor(id, vnode) {
       this.id = id
       this.n = link(vnode, this)
@@ -9,7 +9,7 @@ export default ({link}) => {
     }
 
     accepts(node) {
-      return node instanceof Lifted && this.n.accepts(node.n)
+      return node instanceof Combined && this.n.accepts(node.n)
     }
 
     isReady() {
@@ -45,7 +45,7 @@ export default ({link}) => {
     }
   }
 
-  Lifted.prototype.__isNode = true
-  return Lifted
+  Combined.prototype.__isNode = true
+  return Combined
 }
 

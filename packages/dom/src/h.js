@@ -70,7 +70,7 @@ export default (SA, {newId, Nodes: {Text, Element, StaticElement}}) => {
     let res = {val: {v: chv, m: null}, static: true}
     while (i--) {
       const ch = children[i]
-      if (isObs(ch) && !isLiftedObs(ch)) {
+      if (isObs(ch) && !isCombinedNode(ch)) {
         setObsChAt(res, i, ch)
         s = false
       } else {
@@ -92,7 +92,7 @@ export default (SA, {newId, Nodes: {Text, Element, StaticElement}}) => {
       ? text("")
       : isPrimitive(x)
       ? text(`${x}`)
-      : isLiftedObs(x)
+      : isCombinedNode(x)
       ? x.__vnode
       : throws(`Not a valid virtual node ${x}`)
   }
@@ -111,7 +111,7 @@ export default (SA, {newId, Nodes: {Text, Element, StaticElement}}) => {
     return x && x.__isNode
   }
 
-  function isLiftedObs(x) {
+  function isCombinedNode(x) {
     return isVNode(x.__vnode)
   }
 }

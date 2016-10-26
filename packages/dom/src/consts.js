@@ -3,7 +3,7 @@ import {zipObj} from "@culli/base"
 const ELEM = 0
 const TEXT = 1
 const STATIC_ELEM = 2
-const LIFTED = 3
+const COMBINED = 3
 
 const htmlAttrs =
   "accept accept-charset accesskey action align alt async autocomplete autofocus " +
@@ -42,7 +42,7 @@ export const NodeTypes = {
   ELEM,
   STATIC_ELEM,
   TEXT,
-  LIFTED
+  COMBINED
 }
 
 // identity for pending prop values

@@ -1,13 +1,13 @@
 import {__, O, extend} from "@culli/base"
 import {isStr, newId} from "./util"
 import H from "./h"
-import Lift from "./lift"
+import Combine from "./combine"
 import Lifecycle from "./lifecycle"
 import P from "./patching"
 import {Events, make} from "./events"
 import * as domApi from "./dom"
 
-import Lifted from "./vdom/Lifted"
+import Combined from "./vdom/Combined"
 import Text from "./vdom/Text"
 import Element from "./vdom/Elem"
 import StaticElement from "./vdom/StaticElem"
@@ -25,7 +25,7 @@ export default function (domRoot) {
     extend(context, {patch: P(context)})
     extend(context, {
       Nodes: {
-        Lifted: Lifted(context),
+        Combined: Combined(context),
         Text: Text(context),
         Element: Element(context),
         StaticElement: StaticElement(context)
@@ -33,7 +33,7 @@ export default function (domRoot) {
     })
     extend(context, {
       h: H(SA, context),
-      lift: Lift(SA, context)
+      combine: Combine(SA, context)
     })
 
 
@@ -51,10 +51,10 @@ export default function (domRoot) {
       }
     }))
 
-    const Source = context.lift
-    Source.h = context.h
-    Source.lift = context.lift
-    return Source
+    return {
+      h: context.h,
+      combine: context.combine
+    }
   }
 
   DOMDriver.streamAdapter = O.Adapter

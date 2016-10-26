@@ -2,33 +2,33 @@ import {O} from "@culli/base"
 import {throws} from "./util"
 
 
-export default (SA, {newId, Nodes: {Lifted}}) => {
+export default (SA, {newId, Nodes: {Combined}}) => {
   const convertOut = O.adaptOut(SA)
   const convertIn = O.adaptIn(SA.streamSubscribe)
   const isObs = x => x && SA.isValidStream(x)
   const hold = SA.remember
 
-  return function lift(vdom) {
+  return function combine(vdom) {
     if (isVNode(vdom)) {
-      const vnode = lifted(vdom)
+      const vnode = combined(vdom)
       const obs = convertOut(O.of(vnode))
       obs.__vnode = vnode
       return obs
     } else if (isObs(vdom)) {
-      const obs = convertOut(O.map(liftInner, convertIn(vdom)))
+      const obs = convertOut(O.map(combineInner, convertIn(vdom)))
       return hold(obs)
     } else {
-      throws(`Can't lift vdom: ${vdom}`)
+      throws(`Can't combine vdom: ${vdom}`)
     }
   }
 
-  function lifted(vnode) {
-    return new Lifted(newId(), vnode)
+  function combined(vnode) {
+    return new Combined(newId(), vnode)
   }
 
-  function liftInner(vnode) {
-    !isVNode(vnode) && throws(`Can't lift vnode: ${vnode}`)
-    return lifted(vnode)
+  function combineInner(vnode) {
+    !isVNode(vnode) && throws(`Can't combine vnode: ${vnode}`)
+    return combined(vnode)
   }
 
   function isVNode(x) {
