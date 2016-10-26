@@ -1,27 +1,39 @@
 # @culli/dom
 
+> Concise, ultra high-performance and minimalistic Virtual DOM implementation
+> that supports true Cycle MVI pattern without need of isolation
+
 [![npm](https://img.shields.io/npm/v/@culli/dom.svg?style=flat-square)](https://www.npmjs.com/package/@culli/dom)
 
-Utilities for Cycle DOM manipulation and listening.
+**WIP!** This package is still under heavy development, use with extreme care!!
 
-## Motivation
+## Example
 
-Why was this package created...
+```js
+import * as O from "most"
+import {run} from "@cycle/most-run"
+import DOM from "@culli/dom"
 
-### When to choose `@culli/dom`
+function main(x) {
+  console.log(x)
+  const {DOM: {h, combine}} = x
+  const date =
+    O.periodic(1000).map(() => new Date().toTimeString())
 
-- asd
-- asd
+  const vdom = h("div", [
+    h("h2", ["Clock is: ", date])
+  ])
 
-### When to choose `@cycle/dom`
+  return {
+    DOM: combine(vdom)
+  }
+}
 
-- asd
-- asd
+run(main, {
+  DOM: DOM("#app")
+})
+```
 
-
-## API
-
-TODO
 
 ## License
 
