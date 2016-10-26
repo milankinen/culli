@@ -21,7 +21,7 @@
     "newpkg": "lehm create package",
     "commit": "northbrook commit",
     "ci": "nb commit",
-    "release": "northbrook release"
+    "release": "northbrook release --skip-login"
   },
   "devDependencies": {
     "babel-cli": "^6.16.0",
