@@ -88,9 +88,10 @@ function main({Store: {value, actions}) {
 
 ```
       
-#### `mapChildren :: (fn: ChildFn, eventSinks = ["Store"], valueSinks: ["DOM"]) => {[string]: Observable<any>}` 
+#### `mapChildren :: (fn: ChildFn, SinkSpec) => {[string]: Observable<any>}` 
 ```
 ChildFn :: (item: StoreSource<S>, key: string) => {[string]: Observable<any>}
+SinkSpec :: { values :: [string], events :: [string] }
 ```
 
 If the store's value is an array, this method maps through all array items and applies
@@ -98,11 +99,10 @@ the given child function `fn` to each item in the array. Returned child sink obj
 combined, flattened and exracted so that the result value of this method is a 
 CycleJS sink object whose sinks emit values from child sink objects.
 
-In order to detect which sinks this method must exract, user must define the names
-of the extracted value and event sinks (see section [observable values and events](TODO)).
+In order to detect which sinks this method must exract, user must give `SinkSpec` which
+defines the names of the extracted value and event sinks (see section [observable values and events](TODO)).
 Value sinks are exracted by using `combine` combinator, event sinks are extracted
-by using `merge` combinator. Default values are `["Store"]` (event sink names) and
-`["DOM"]` (value sink names).
+by using `merge` combinator. 
 
 
 This method is extremely useful if you want to create a list of child components,
@@ -167,7 +167,7 @@ function Child({DOM, Store}) {
 ```
 
 
-#### `mapChildrenBy :: (keyFn: KeyFn, fn: ChildFn, eventSinks = ["Store"], valueSinks: ["DOM"]) => {[string]: Observable<any>}` 
+#### `mapChildrenBy :: (keyFn: KeyFn, fn: ChildFn, SinkSpec) => {[string]: Observable<any>}` 
 ```
 KeyFn :: (item: S) => string
 ```

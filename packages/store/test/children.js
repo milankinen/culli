@@ -11,7 +11,7 @@ describe("mapChildren", () => {
 
   it("creates sinks for each key", () => {
     const store = Store(Memory([{id: "1"}, {id: "2"}]))(O.never(), O.Adapter)
-    const children = store.value.mapChildren(Child, ["Foo", "Bar"], ["Lol"])
+    const children = store.value.mapChildren(Child, {events: ["Foo", "Bar"], values: ["Lol"]})
     isObj(children).should.be.true()
     keys(children).length.should.eql(3)
     O.is(children.Foo).should.be.true()
@@ -21,7 +21,7 @@ describe("mapChildren", () => {
 
   it("combines value sinks of children over time", done => {
     const values = run([{id: "a"}, {id: "b"}], ({value}) => {
-      const children = value.mapChildren(Child, ["Eff"], ["DOM"])
+      const children = value.mapChildren(Child, {events: ["Eff"], values: ["DOM"]})
       const expected = [["a-1d", "b-1d"], ["a-2d", "b-1d"], ["a-2d", "b-2d"]]
       __(children.DOM.take(3), subscribeAndExpect(expected, done))
       return [value, O.empty()]
@@ -31,7 +31,7 @@ describe("mapChildren", () => {
 
   it("merges event sinks from children", done => {
     const values = run([{id: "a"}, {id: "b"}], ({value}) => {
-      const children = value.mapChildren(Child, ["Eff"], ["DOM"])
+      const children = value.mapChildren(Child, {events: ["Eff"], values: ["DOM"]})
       const expected = ["a-1e", "b-1e", "a-2e", "b-2e"]
       __(children.Eff.take(4), subscribeAndExpect(expected, done))
       return [value, O.empty()]
@@ -42,7 +42,7 @@ describe("mapChildren", () => {
   it("preserves the underlying subscriptions even if children change", done => {
     const values = run([{id: "a"}, {id: "b"}], ({value, actions}) => {
       const dispatch = actions.reduce((state, action) => action(state))
-      const children = value.mapChildren(Child, ["Eff"], ["DOM"])
+      const children = value.mapChildren(Child, {events: ["Eff"], values: ["DOM"]})
       const expected = [
         ["a-1d", "b-1d"],
         ["a-1d", "b-1d", "c-1d"],

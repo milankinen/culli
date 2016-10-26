@@ -33,11 +33,11 @@ export default (SA, equality) => {
       return dispatch
     }
 
-    function mapChildren(fn, eventSinks, valueSinks) {
-      return mapChildrenBy(it => it.id, fn, eventSinks, valueSinks)
+    function mapChildren(fn, sinkSpec) {
+      return mapChildrenBy(it => it.id, fn, sinkSpec)
     }
 
-    function mapChildrenBy(identityFn, fn, eventSinks = ["Store"], valueSinks = ["DOM"]) {
+    function mapChildrenBy(identityFn, fn, {events: eventSinks = [], values: valueSinks = []} = {}) {
       // make sure identity is string type
       const ident = pipe(identityFn, str)
 

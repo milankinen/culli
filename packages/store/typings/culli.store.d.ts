@@ -22,13 +22,9 @@ export interface ItemStoreValue<S> {
 }
 
 export interface ArrayStoreValue<S> extends ItemStoreValue<Array<S>> {
-    mapChildren: (childFn:ChildFn<S>,
-                  eventSinks?:Array<string>,
-                  valueSinks?:Array<string>)
-        => {[name: string]: Observable<any>}
+    mapChildren: (childFn:ChildFn<S>, sinkSpec:SinkSpec) => ExtractedSinks
 
-    mapChildrenBy: (keyFn:KeyFn<S>, childFn:ChildFn<S>, eventSinks?:Array<string>, valueSinks?:Array<string>)
-        => {[name: string]: Observable<any>}
+    mapChildrenBy: (keyFn:KeyFn<S>, childFn:ChildFn<S>, sinkSpec:SinkSpec) => ExtractedSinks
 }
 
 export interface StoreActions<S> {
@@ -48,3 +44,9 @@ export declare type ChildFn<S> = (item:ItemSource<S>, key?:string) => {[name: st
 
 export declare type KeyFn<S> = (item:S) => string
 
+export declare type SinkSpec = {
+    events?: Array<string>,
+    values?: Array<string>
+}
+
+export declare type ExtractedSinks = {[name: string]: Observable<any>}
