@@ -102,6 +102,7 @@ You should choose `@culli/store` when:
     list changes)
   * You want to keep an option for more complex state storage (like hot-reloadable
     memory, local storage or server/websockets)
+  * You want to benefit from Redux's [rich ecosystem](https://vimeo.com/189374682)
 
 
 ## Some code, please!
