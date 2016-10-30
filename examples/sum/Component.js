@@ -40,7 +40,10 @@ export default function main(sources) {
     const children = items.value.mapChildren(it => Slider({...sources, Store: it}),
       {values: ["DOM"], events: ["Store"]})
 
+    const sum = items.value.map(items => calcSum(items.map(it => it.val)))
+
     const vdom = h("div", [
+      h("h1", ["Total: ", sum]),
       h("button.add", "Add slider"),
       h("hr"),
       h("div.sliders", children.DOM)
@@ -54,4 +57,12 @@ export default function main(sources) {
       .on(".add", "click")
       .map(e => ({type: "ADD"}))
   }
+}
+
+function calcSum(vals) {
+  let s = 0
+  for (let i = 0; i < vals.length; i++) {
+    s += vals[i]
+  }
+  return s
 }

@@ -38,6 +38,6 @@ export default function main({DOM: {h, combine}, Store, min = 0, max = 100, step
   function intent(vdom) {
     return vdom
       .on(".slider", "input")
-      .map(e => ({type: "SET", payload: e.target.value}))
+      .map(e => ({type: "SET", payload: Number(e.target.value)}))
   }
 }
