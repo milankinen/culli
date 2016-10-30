@@ -38,10 +38,9 @@ export default function main({DOM, Store}) {
 
   function view({items}) {
     const children = items.value.mapChildren((counter, id) => {
-      console.log(counter, id)
       const Component = isolate(Counter, id)
       return Component({DOM, Store: counter})
-    })
+    }, {values: ["DOM"], events: ["Store"]})
 
     return {
       childActions: children.Store,
