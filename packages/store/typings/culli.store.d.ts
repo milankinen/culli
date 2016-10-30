@@ -1,11 +1,12 @@
 export declare type Observable<S> = any
 
-export default function <S>(initialState:S):(actions:StoreSink<S>) => StoreSource<S>
+export default function <S>(storage: Storage<S>):(actions:StoreSink<S>) => StoreSource<S>
 
 export declare type StoreSource<S> = ItemSource<S> | ArraySource<S>
 
 export declare type StoreSink<S> = Observable<Action<any>>
 
+export declare type Storage<S> = (actions: Observable<Action<S>>) => Observable<S>
 
 export declare type ItemSource<S> = {
     value: ItemStoreValue<S>
@@ -50,3 +51,10 @@ export declare type SinkSpec = {
 }
 
 export declare type ExtractedSinks = {[name: string]: Observable<any>}
+
+
+/** Built-in storages **/
+
+export declare function Memory<S>(initialState: S): Storage<S>
+
+export declare function ReduxDevtools<S>(initialState: S): Storage<S>

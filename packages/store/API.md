@@ -207,9 +207,9 @@ which transforms the given scalar state into new state.
 modifies it synchronously based on the received actions. The new state is emitted immediately
 to the application.
 
-#### `HotReloadable<S> :: (initialState: S) => Storage<S>`
+#### `ReduxDevtools<S> :: (initialState: S) => Storage<S>`
 
-Same as `Memory` but preserves the state across Hot Module Reloads but will re-create the
-state when browser window is refreshed. Perfect pair with `HMR` loader.
+**Experimental!** Same as `Memory` but allows also debugging actions and state changes with
+[Redux Devtools extensions](https://github.com/zalmoxisus/redux-devtools-extension).
 
 #### More will come...
