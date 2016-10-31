@@ -1,3 +1,12 @@
+# v0.4.0 (2016-10-31)
+---
+
+
+## Features
+
+- feat(store): Add byType utility function for compact reducer building [e95722cf](https://github.com/milankinen/culli/commits/e95722cfa5d29d8b4ea344e67316fe52d08ccc4c)
+
+
 # v0.3.0 (2016-10-31)
 ---
 
