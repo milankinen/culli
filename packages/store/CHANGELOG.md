@@ -1,3 +1,16 @@
+# v0.3.0 (2016-10-31)
+---
+
+
+## Features
+
+- feat(store): Replace HotReloadable storage with ReduxDevtools storage [0d37d27f](https://github.com/milankinen/culli/commits/0d37d27ffce9bd3ba375d8b0e85a5526b2670b0f)
+
+## Performance Improvements
+
+- perf(store): Add performance comparison to cycle-onionify [67d0179e](https://github.com/milankinen/culli/commits/67d0179eec5a04673992a9acbd73e365db03bc7d)
+
+
 # v0.2.0 (2016-10-27)
 ---
 
