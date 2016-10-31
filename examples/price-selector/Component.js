@@ -46,7 +46,8 @@ export default function main(sources) {
       // ensure that "from" can't be bigger than "to"
       max: valOf(props.to)
     })
-    const to = Slider({...sources,
+    const to = Slider({
+      ...sources,
       Store: props.to,
       // ensure that "to" can't be smaller than "from"
       min: valOf(props.from),
