@@ -65,10 +65,8 @@ export default function main(sources) {
       h("h1", ["Select price (", valOf(props.price), ")"]),
       price.DOM,
       h("hr"),
-      h("h4", "From:"),
-      from.DOM,
-      h("h4", "To:"),
-      to.DOM
+      h("h4", "From:"), from.DOM,
+      h("h4", "To:"), to.DOM
     ])
 
     return {
