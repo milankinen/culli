@@ -1,4 +1,4 @@
-import {__, O, throws, pipe} from "@culli/base"
+import {__, O, throws, pipe, isObj, identity} from "@culli/base"
 import makeStore, {Action} from "./store"
 import * as L from "./lenses"
 
@@ -40,6 +40,16 @@ export default function (storage, opts = {}) {
 
   StoreDriver.streamAdapter = O.Adapter
   return StoreDriver
+}
+
+// Utils
+
+export function byType(reducers) {
+  !isObj(reducers) && throws(`Reducers must be an object of functions, instead got: ${reducers}`)
+  return function byTypeReducer(state, action) {
+    const reducer = action && action.type ? reducers[action.type] || identity : identity
+    return reducer(state, action && action.payload)
+  }
 }
 
 // Storages

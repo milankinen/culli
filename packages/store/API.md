@@ -213,3 +213,27 @@ to the application.
 [Redux Devtools extensions](https://github.com/zalmoxisus/redux-devtools-extension).
 
 #### More will come...
+
+### Utility functions
+
+#### `byType<S> :: (reducers: {[string]: ReducerFn<S>}) => ReducerFn<S>`
+
+Creates an aggregated reducer function that delegates `action.payload` to the mini-reducer
+functions matching `action.type` values of the reduced actions
+
+```js
+import {byType} from "@culli/store"
+...
+
+const dispatch = actions.reduce(byType({
+  "ADD": (state, item) => [...state, item],
+  "REMOVE": (state, id) => state.filter(it => it.id !== id)
+})
+...
+
+const actions = O.merge(
+  addClicks.map(() => ({type: "ADD", payload: createItem()}),
+  removeClicks.map(e => ({type: "REMOVE", payload: e.target.id})
+)
+```
+

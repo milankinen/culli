@@ -29,7 +29,7 @@ export interface ArrayStoreValue<S> extends ItemStoreValue<Array<S>> {
 }
 
 export interface StoreActions<S> {
-    reduce: (reducer:(state:S, action:any) => S) => DispatchFn<S>
+    reduce: (reducer: ReducerFn) => DispatchFn<S>
 }
 
 export declare type Selector = string | number
@@ -45,12 +45,18 @@ export declare type ChildFn<S> = (item:ItemSource<S>, key?:string) => {[name: st
 
 export declare type KeyFn<S> = (item:S) => string
 
+export declare type ReducerFn<S> = (state:S, action:any) => S
+
 export declare type SinkSpec = {
     events?: Array<string>,
     values?: Array<string>
 }
 
 export declare type ExtractedSinks = {[name: string]: Observable<any>}
+
+/** Utility functions **/
+
+export declare function byType<S>(reducers: {[name: string]: ReducerFn<S>}): ReducerFn<S>
 
 
 /** Built-in storages **/
