@@ -2,10 +2,6 @@ import * as O from "most"
 import Slider from "../slider/Component"
 
 
-let ID = 0
-export const nextId = () => ++ID
-
-
 export default function main(sources) {
   const {DOM: {h, combine}, Store} = sources
   const {dispatch, props} = model(Store)
