@@ -36,7 +36,7 @@
     "lcov-result-merger": "^1.2.0",
     "lehm": "^0.3.4",
     "mocha": "^3.1.2",
-    "northbrook": "^3.2.1",
+    "northbrook": "3.2.1",
     "npm-check-updates": "^2.8.5",
     "nyc": "^8.3.1",
     "rimraf": "^2.5.4",
