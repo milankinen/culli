@@ -1,6 +1,6 @@
 import * as most from "most"
-import mhold from "@most/hold"
-import {subject} from "most-subject"
+import {hold as mhold} from "@most/hold"
+import {async as subject} from "most-subject"
 import curry from "./curry"
 import {isFun} from "./util"
 
