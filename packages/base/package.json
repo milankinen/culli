@@ -1,6 +1,6 @@
 {
   "name": "@culli/base",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Base utils for cullish cycle library development",
   "author": "Matti Lankinen <m.lankinen@iki.fi> (https://github.com/milankinen)",
   "license": "MIT",
