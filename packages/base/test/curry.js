@@ -1,3 +1,4 @@
+import should from "should"
 import {curry} from "../src/index"
 
 
@@ -22,5 +23,8 @@ describe("currying", () => {
     f2(1, 2).should.equal(3)
     f2(1)(2).should.equal(3)
     f2(1, 2, 3).should.equal(3)
+  })
+  it("throws an exception if the given argument is not a function", () => {
+    should.throws(() => curry("tsers"))
   })
 })

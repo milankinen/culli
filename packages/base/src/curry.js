@@ -1,3 +1,5 @@
+import {isFun, throws} from "./util"
+
 const curry2 = f => function curried2(a0, a1) {
   switch (arguments.length) {
     case 0:
@@ -33,6 +35,9 @@ const curryN = f => {
 }
 
 const curry = f => {
+  if (process.ENV !== "production") {
+    !isFun(f) && throws(`Curried argument is not a function: ${f}`)
+  }
   switch (f.length) {
     case 0:
     case 1:
