@@ -7,7 +7,10 @@
   "scripts": {
     "watch-onionify": "watchify onionify-sum/index.js -v -t babelify -o onionify-sum/bundle.js",
     "watch-culli": "watchify culli-sum/index.js -v -t babelify -o culli-sum/bundle.js",
-    "watch-motorcycle": "watchify motorcycle-sum/index.js -v -t babelify -o motorcycle-sum/bundle.js"
+    "watch-motorcycle": "watchify motorcycle-sum/index.js -v -t babelify -o motorcycle-sum/bundle.js",
+    "onionify-app": "browserify onionify-sum/index.js -v -t babelify -o onionify-sum/bundle.js && open onionify-sum/index.html",
+    "culli-app": "browserify culli-sum/index.js -v -t babelify -o culli-sum/bundle.js && open culli-sum/index.html",
+    "motorcycle-app": "browserify motorcycle-sum/index.js -v -t babelify -o motorcycle-sum/bundle.js && open motorcycle-sum/index.html"
   },
   "dependencies": {
     "@culli/dom": "latest",
@@ -21,6 +24,7 @@
     "babel-preset-es2015": "^6.22.0",
     "babel-preset-stage-2": "^6.22.0",
     "babelify": "^7.3.0",
+    "browserify": "^14.1.0",
     "cycle-onionify": "^2.4.0",
     "most-combineobj": "^1.0.0",
     "watchify": "^3.9.0",
