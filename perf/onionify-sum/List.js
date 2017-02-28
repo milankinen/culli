@@ -7,7 +7,7 @@ import Slider from "./Slider"
 const N = 2000
 
 export default function main(sources) {
-  const {vdom, children} = view(sources.onion.state$.filter(s => s !== undefined))
+  const {vdom, children} = view(sources.onion.state$.filter(s => s !== undefined).remember())
   const actions = intent(sources.DOM)
   const reducers = model(actions)
 

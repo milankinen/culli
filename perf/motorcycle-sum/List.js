@@ -41,7 +41,7 @@ export default function main(sources) {
       {values: ['DOM'], events: ['Store']})
     const state = combineObj({ childrenDOM: children.DOM, items: items.value })
     const vdom = state.map(({ childrenDOM, items }) => div({}, [
-      h1('.header', `CULLI witch cycle DOM: ${items.length}`),
+      h1('.header', `CULLI witch motorcycle DOM: ${items.length}`),
       button('.add', 'Add slider'),
       hr(),
       div('.sliders', childrenDOM)
